@@ -78,31 +78,44 @@ function Cell() {
 
 function GameController() {
     const board = GameBoard.getBoard();
+    let gameEnd = false;
+
+    function resetGame() {
+        GameBoard.resetBoard();
+        gameEnd = false;
+    }
 
     function isWin(row, col) {
+        // horizontal and vertical cells check.
         if(board[row][0].getValue() === board[row][1].getValue() && board[row][1].getValue() === board[row][2].getValue()) return true;
         if(board[0][col].getValue() === board[1][col].getValue() && board[1][col].getValue() === board[2][col].getValue()) return true;
 
+        // diagonal cells check.
         if(row === col && board[0][0].getValue() === board[1][1].getValue() && board[1][1].getValue() === board[2][2].getValue()) return true;
         if(row + col === 2 && board[0][2].getValue() === board[1][1].getValue() && board[1][1].getValue() === board[2][0].getValue()) return true;
-
         return false;
     };
 
     const playRound = (row, col) => {
-        if(board[row][col].getValue() !== '-') return;
-        console.log(`${GameBoard.getPlayer().token} is dropped by ${GameBoard.getPlayer().playerName}`);
+        if(gameEnd) return "end";
+        if(board[row][col].getValue() !== '-') return;  // return, if cell is already occupied.
         GameBoard.dropToken(row, col, GameBoard.getPlayer());
 
-        // Winning Condition.
-        if(isWin(row, col)) return "WIN";
-        else if(GameBoard.isBoardFull()) return "TIE";
+        if(isWin(row, col)) {               // winning condition.
+            gameEnd = true;
+            return "WIN";
+        }               
+        else if(GameBoard.isBoardFull()) {  // tie condition.
+            gameEnd = true;
+            return "TIE";
+        }
 
         GameBoard.switchPlayer();
     }
 
     return {
         playRound,
+        resetGame,
     };
 }
 
@@ -112,6 +125,7 @@ function displayBoard() {
     const board = GameBoard.getBoard();
     const boardBox = document.getElementById("board");
     boardBox.textContent = "";
+
     for(let r = 0 ; r < 3 ; r++) {
         const row = document.createElement("div");
         for(let c = 0 ; c < 3 ; c++) {
@@ -130,12 +144,35 @@ function displayBoard() {
 displayBoard();
 function screenController() {
     const boardBox = document.getElementById("board");
+    const msg = document.getElementById("msg");
+
+    function processGameState(round) {
+        if(round === "WIN") msg.textContent = `${GameBoard.getPlayer().playerName} is WON`;
+        else if(round === "TIE") msg.textContent = `It's TIE`;
+        else if(round === 'end') return;
+        else {
+            msg.textContent = "";
+            const token = document.createElement("p");
+            const turn = document.createElement("p");
+            GameBoard.switchPlayer();
+            token.textContent = `${GameBoard.getPlayer().token} is dropped by ${GameBoard.getPlayer().playerName}`;   
+            GameBoard.switchPlayer();
+            turn.textContent += `${GameBoard.getPlayer().playerName}'s turn...`;
+
+            msg.appendChild(token);
+            msg.appendChild(turn);
+        }
+    }
 
     boardBox.addEventListener("click", (e) => {
-        const selectedRow = e.target.dataset.row;
-        const selectedCol = e.target.dataset.col;
-        if(!selectedCol || !selectedRow) return;
-        game.playRound(selectedRow, selectedCol);
+        // If clicked on borders and input not get selected.
+        const selectedRow = Number(e.target.dataset.row);
+        const selectedCol = Number(e.target.dataset.col);
+        // if(!selectedCol || !selectedRow) return;
+
+        // Playin round and processing gamestate.
+        const round = game.playRound(selectedRow, selectedCol);
+        processGameState(round);
         displayBoard();
     })
 }
