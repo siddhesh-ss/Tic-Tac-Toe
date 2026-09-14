@@ -23,7 +23,7 @@ const GameBoard = (() => {
     }
 
     const resetBoard = () => {
-        board.map(row => row.map(cell => cell.addToken('-')));
+        board.map(row => row.map(cell => cell.addToken(' ')));
     };
 
     const getBoard  = () => board;
@@ -45,7 +45,7 @@ const GameBoard = (() => {
     const isBoardFull = () => {
         for(let row of board) {
             for(let col of row) {
-                if(col.getValue() === '-') return false;
+                if(col.getValue() === ' ') return false;
             }
         }
         return true;
@@ -64,7 +64,7 @@ const GameBoard = (() => {
 })();
 
 function Cell() {
-    let value = '-';
+    let value = ' ';
 
     const addToken = (player) => {value = player};
 
@@ -98,7 +98,7 @@ function GameController() {
 
     const playRound = (row, col) => {
         if(gameEnd) return "end";
-        if(board[row][col].getValue() !== '-') return;  // return, if cell is already occupied.
+        if(board[row][col].getValue() !== ' ') return;  // return, if cell is already occupied.
         GameBoard.dropToken(row, col, GameBoard.getPlayer());
 
         if(isWin(row, col)) {               // winning condition.
@@ -116,6 +116,7 @@ function GameController() {
     return {
         playRound,
         resetGame,
+        gameEnd,
     };
 }
 
@@ -125,6 +126,7 @@ function displayBoard() {
     const board = GameBoard.getBoard();
     const boardBox = document.getElementById("board");
     boardBox.textContent = "";
+    let cellBorder = "1px solid white"
 
     for(let r = 0 ; r < 3 ; r++) {
         const row = document.createElement("div");
@@ -134,6 +136,13 @@ function displayBoard() {
             col.classList.add("cell");
             col.dataset.row = r;
             col.dataset.col = c;
+
+            // For specific border (just styling)...
+            if(c != 0) col.style.borderLeft = cellBorder;
+            if(c != 2) col.style.borderRight = cellBorder;
+            if(r != 0) col.style.borderTop = cellBorder;
+            if(r != 2) col.style.borderBottom = cellBorder;
+
             row.appendChild(col);
         }
         row.classList.add("row");
@@ -145,9 +154,10 @@ displayBoard();
 function screenController() {
     const boardBox = document.getElementById("board");
     const msg = document.getElementById("msg");
+    const reset = document.getElementById("reset");
 
     function processGameState(round) {
-        if(round === "WIN") msg.textContent = `${GameBoard.getPlayer().playerName} is WON`;
+        if(round === "WIN") msg.textContent = `${GameBoard.getPlayer().playerName} is the WINNER`;
         else if(round === "TIE") msg.textContent = `It's TIE`;
         else if(round === 'end') return;
         else {
@@ -155,7 +165,7 @@ function screenController() {
             const token = document.createElement("p");
             const turn = document.createElement("p");
             GameBoard.switchPlayer();
-            token.textContent = `${GameBoard.getPlayer().token} is dropped by ${GameBoard.getPlayer().playerName}`;   
+            token.textContent = `${GameBoard.getPlayer().token} is dropped by ${GameBoard.getPlayer().playerName},`;   
             GameBoard.switchPlayer();
             turn.textContent += `${GameBoard.getPlayer().playerName}'s turn...`;
 
@@ -174,6 +184,12 @@ function screenController() {
         const round = game.playRound(selectedRow, selectedCol);
         processGameState(round);
         displayBoard();
-    })
+    });
+
+    reset.addEventListener("click", (e) => {
+        game.resetGame();
+        displayBoard();
+        msg.textContent = "";
+    });
 }
 screenController();

@@ -4,31 +4,112 @@
 
 }
 
+@font-face {
+    font-family: "chalk";
+    src: url(fonts/ChalktasticItalic-pEwZ.ttf);
+}
+
 .window {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    flex-direction: column;
+    flex-direction: column-reverse;
+    gap: 1rem;
+    background-image: url(img/bg2.jpg);
+    background-position: center;
+    background-size: cover;
 }
 
 #board {
     font-size: medium;
+    background-image: url(img/slate.png);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 440px;
+    height: 320px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 3.2rem 0 0 0;
 }
 
 #msg {
     font-size: large;
-    border: 2px solid red;
+    height: 13.5rem;
+    width: 22.95rem;
+    padding: .5rem;
+    margin-top: 1.2rem;
+    background-image: url(img/scroll.png);
+    background-position: center;
+    background-size: cover;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: "chalk";
+    font-size: 1.2rem;
 }
 
 .cell {
-    width: 2rem;
-    height: 2rem;
+    border: none;
+    width: 7rem;
+    height: 4.9rem;
     text-align: center;
-    border: 2px solid black;
+    background: transparent;
+    color: white;
+    font-size: 4rem;
+    font-family: "chalk";
+    
+}
+
+.cell:hover {
+    cursor: pointer;
 }
 
 .row {
     display: flex;
-    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+#reset {
+    position: absolute;
+    top: 12rem;
+    left: 8rem;
+    background-color: red;
+    border-radius: .5rem;
+    padding: .5rem 1rem;
+    color: white;
+    font-weight: bold;
+    font-family: "chalk";
+    width: 6rem;
+
+}
+
+#reset:hover {
+    cursor: pointer;
+    background-color: rgb(183, 1, 1);
+}
+
+#credit {
+    position: absolute;
+    font-family: "chalk";
+    bottom: 2rem;
+    right: 2rem;
+    color: yellow;
+}
+
+
+/*Just Experimenting*/
+@media (max-width: 900px) {
+    #reset {
+        top: .5rem;
+        left: 40%;
+    }
 }
